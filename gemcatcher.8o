@@ -1,0 +1,207 @@
+# Gem Catcher
+# by Dakota Hernandez
+#
+# You play the role of an adventurer who has found themselves in a magical cave,
+# rumored to once be the home of a powerful wizard. Deep within its tunnels, 
+# they come across an enchanted room where gems drop from the ceiling! 
+# Eager to strike it rich, the adventurer scrambles to catch as many as they can. 
+# The room has some powerful protection, however – if five gems touch the ground, 
+# then a powerful wave of magic will force the adventurer out of the cave. 
+# How many gems can they catch before they are forced out?
+#
+# Controls
+# A: move left
+# D: move right
+#
+# Collect gems for as long as you can! Touch a gem to collect it.
+# After 30 gems are collected, they fall at a faster rate.
+# Let 5 touch the ground, and it's game over.
+# Good luck!
+#
+# Works best at 15 Cycles/Frame, but try 20 for a tougher (and more difficult-to-control) mode.
+#
+# Last Edited: October 29, 2017
+
+# sprites
+: gem 0x7A 0x76 0x3C 0x18
+: adventurer 0x5A 0xE7 0xBD 0x5A 0x3C 0x18 0x18 0x24
+: adventurer-walk1 0x5A 0xE7 0xBD 0x5A 0x3C 0x18 0x38 0x04  
+: adventurer-walk2 0x5A 0xE7 0xBD 0x5A 0x3C 0x18 0x1C 0x20 
+: edge   0xFF 0xFF
+: game-over1 0xAE 0xAA 0x4A 0x4E
+: game-over2 0xA4 0xA4 0xA4 0xE6
+: game-over3 0xEE 0xAC 0xA6 0xEE
+: game-over4 0xE8 0x88 0xC0 0xE8
+
+
+# List of Register Aliases
+# Position, Lives, and Points for Adventurer
+:alias advx     ve
+:alias advy	vd
+:alias lives	vc
+:alias points	vb
+:alias anim-frame va
+# Gem Variables: Counter, Positions, timer, speed
+:alias counter	v9
+:alias gemx	v1
+:alias gemy	v2
+:alias gemspeed v8
+
+# v0, v3-v6, and vf are left as temporaries
+
+# temporary storage for gem data - First number is # of frames before spawning, the other two store the positions of the gems.
+: g1  1 0 0
+: g2 20 0 0
+: g3 40 0 0
+: g4 90 0 0
+
+:const ADV_Y 23
+:const INITIAL_SPEED 1
+:const SPEED_UP 2
+
+: main
+	init-game
+	# Main game loop
+	loop
+		move-adventurer
+		update-gems
+		if lives == 0 then jump gameover
+		if points == 30 then gemspeed := SPEED_UP
+	again
+
+: init-game
+# Initialize registers
+	# Default positions
+	advx := 28
+	v3 := ADV_Y
+	points := 0
+	lives := 5
+	counter := 0
+	gemspeed := INITIAL_SPEED
+# Draw the scene - we take advantage of sprite looping and just use one sprite command to draw the border.
+	i := edge
+	v0 := 0
+	v4 := 31
+	loop
+		sprite v0 v4 2
+		v0 += 8
+		if v0 != 64 then
+	again
+	i := adventurer
+	sprite advx v3 8
+;
+
+# Movement code for the player character
+# Based on code from John Earnest's Octo Intermediate Tutorial for the Outlaw recreation.
+
+: move-adventurer
+	v4 := advx
+	v5 := ADV_Y
+	# update "position" depending on what key is held.
+	v0 := 7
+	if v0 key then v4 += -3
+	v0 := 9
+	if v0 key then v4 +=  3
+
+	# Tweak v0 for animation purposes
+	# Give it the proper offset for anim-frame later on
+	# Since the adventurer is drawn with a size of 8, the offsets are 8 and 16,
+	# ...each for a different frame.
+	v0 := 0
+	if v4 != advx then v0 := 16
+	if anim-frame == 16 then v0 := 8
+
+	# Erase, move, and redraw sprite
+	i := adventurer
+	i += anim-frame
+	sprite advx v5 8
+	advx := v4
+	anim-frame := v0
+	i := adventurer
+	i += anim-frame
+	sprite advx v5 8
+;
+
+# Gem Logic
+# Based on code written by John Earnest for deep8.
+# In deep8, enemies needed to be avoided and hit with bombs.
+# In this game, however, the player wants to collide with gems and prevent them from touching the floor.
+
+# Spawns a gem in a random horizontal position between 0 and 57.
+# 0-57 is chosen so that no gems spawn in-between the wraparound portions of the play area.
+: spawn-gem
+	gemx := random 57
+	gemy := 1
+	i := gem
+	sprite gemx gemy 4
+;
+
+: count-gem
+	v0 -= v3
+	if v0 == 0 then spawn-gem
+;
+
+# Update the position of the gem.
+: update-gem
+	if v0 != 0 then jump count-gem
+	i := gem
+	sprite gemx gemy 4
+	gemy += gemspeed
+
+	# decrement lives if the gem hits the surface. We also decrement points to counter the increment that happens when the gem disappears
+	if gemy == 27 begin
+		lives += -1
+		points += -1
+	end
+	i := gem
+	sprite gemx gemy 4
+
+	# Increment score if the adventurer grabs a gem.
+	if vf == 0 then return
+	sprite gemx gemy 4
+	v0 := random 31
+	v0 += 10
+	points += 1
+;
+
+: update-gems
+	v3 := 1
+	counter ^= v3
+	if counter == 0 then return
+	# We load the exact vertical position we want for each of the four possible gems.
+	# Get gx, load it, x, and y from gemy, update it, save in gx
+	i := g1 load gemy update-gem i := g1 save gemy
+	i := g2 load gemy update-gem i := g2 save gemy
+	i := g3 load gemy update-gem i := g3 save gemy
+	i := g4 load gemy update-gem i := g4 save gemy
+;
+
+# When lives are 0, this code runs to "pause" the game and activate the buzzer. This buzzer remains for a few frames, then...
+: gameover
+	v0 := 32
+	buzzer := v0
+	delay  := v0
+	loop
+		v0 := delay
+		if v0 != 0 then
+	again
+	lose-game	
+
+# ...we clear the screen and we draw "YOU LOSE!"
+: lose-game
+	clear
+	va := 18
+	vb := 10
+	i  := game-over1
+	sprite va vb 4
+	i  := game-over2
+	va += 8
+	sprite va vb 4
+	i  := game-over3
+	va += 8
+	sprite va vb 4
+	i  := game-over4
+	va += 8
+	sprite va vb 4
+	loop again
+;
