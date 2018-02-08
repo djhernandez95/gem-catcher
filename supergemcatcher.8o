@@ -1,0 +1,287 @@
+# Super Gem Catcher
+# by Dakota Hernandez
+#
+# You play the role of an adventurer who has found themselves in a magical cave,
+# rumored to once be the home of a powerful wizard. Deep within its tunnels, 
+# they come across an enchanted room where gems drop from the ceiling! 
+# Eager to strike it rich, the adventurer scrambles to catch as many as they can. 
+# The room has some powerful protection, however – if five gems touch the ground, 
+# then a powerful wave of magic will force the adventurer out of the cave. 
+# How many gems can they catch before they are forced out?
+#
+# Controls
+# A: move left
+# D: move right
+#
+# Collect gems for as long as you can! Touch a gem to collect it.
+# After 50 gems are collected, they fall at a faster rate.
+# Let 5 touch the ground, and it's game over.
+# Good luck!
+#
+# Works best at 15 Cycles/Frame, but try 20 for a faster, tougher mode of play.
+# Last Edited: February 8, 2018
+# sprites
+: gem 0x7A 0x76 0x3C 0x18
+: adventurer 
+0x0D 0xB0 0xCF 0xF3 0xEA 0x57 0xC7 0xE3 
+0x63 0xC6 0x3F 0xFC 0x1F 0xF8 0x07 0xE0 
+0x07 0xE0 0x07 0xE0 0x07 0xE0 0x06 0x60 
+0x0E 0x70 0x0C 0x30 0x1C 0x38 0x3C 0x3C 
+: adventurer-walk1 
+0x0D 0xB0 0xCF 0xF3 0xEA 0x57 0xC7 0xE3 
+0x63 0xC6 0x3F 0xFC 0x1F 0xF8 0x07 0xE0 
+0x07 0xE0 0x07 0xE0 0x07 0xF0 0x06 0x70 
+0x0E 0x30 0x0C 0x38 0x1C 0x3C 0x3C 0x00
+: adventurer-walk2 
+0x0D 0xB0 0xCF 0xF3 0xEA 0x57 0xC7 0xE3 
+0x63 0xC6 0x3F 0xFC 0x1F 0xF8 0x07 0xE0 
+0x07 0xE0 0x07 0xE0 0x0F 0xE0 0x0E 0x60 
+0x0C 0x70 0x1C 0x30 0x3C 0x38 0x00 0x3C
+
+: floor   0xFF 0xFF 0xFF 0xFF
+: ceiling 0xFF 0xFF
+: game-over1 0xAE 0xAA 0x4A 0x4E
+: game-over2 0xA4 0xA4 0xA4 0xE6
+: game-over3 0xEE 0xAC 0xA6 0xEE
+: game-over4 0xE8 0x88 0xC0 0xE8
+
+
+# List of Register Aliases
+# Position, Lives, and Points for Adventurer
+:alias advx     ve
+:alias advy	vd
+:alias lives	vc
+:alias points	vb
+:alias anim-frame va
+# Gem Variables: Counter, Positions, timer, speed
+:alias counter	v9
+:alias gemx	v1
+:alias gemy	v2
+:alias gemspeed v8
+:alias life-position v7
+
+# v0, v3-v6, and vf are left as temporaries
+
+# temporary storage for gem data - First number is # of frames before spawning, the other two store the positions of the gems.
+: g1  5 0 0
+: g2 20 0 0
+: g3 40 0 0
+: g4 100 0 0
+: g5 175 0 0
+
+# temporary storage for score
+: score 0 0 0
+
+# Register scratch-pad used to store values when scores are incremented.
+: scratch 0 0 0 0
+
+:const ADV_Y 110
+:const INITIAL_SPEED 2
+:const SPEED_UP 3
+
+: main
+	init-game
+	# Main game loop
+	loop
+		move-adventurer
+		update-gems
+		if points == 50 then gemspeed := SPEED_UP
+	again
+
+: init-game
+# Initialize registers
+	# Default positions and values
+	hires
+	draw-score
+	advx := 56
+	v3 := ADV_Y
+	points := 0
+	lives := 5
+	counter := 0
+	gemspeed := INITIAL_SPEED
+	# Draw the scene
+	i := gem
+	life-position := 0
+	v0 := 0
+	loop
+		sprite life-position v0 4
+		life-position += 7
+		if life-position != 35 then
+	again
+	life-position += -7
+
+	i := ceiling
+	v4 := 126
+	loop
+		sprite v0 v4 2
+		v0 += 8
+		if v0 != 128 then
+	again
+	i := floor
+	v0 := 0
+	v4 := 6
+	loop
+		sprite v0 v4 1
+		v0 += 8
+		if v0 != 128 then
+	again
+	
+	i := adventurer
+	sprite advx v3 0
+;
+
+# We load the values stores in the score section into v0, v1, and v2. We then use hex comands to convert the numbers into displayable sprites, which we then write to the top of the screen.
+: draw-score
+	i := score
+	load v2
+	i  := hex v0
+	v0 := 114
+	v3 :=  0
+	sprite v0 v3 5
+	i  := hex v1
+	v0 += 5
+	sprite v0 v3 5
+	i  := hex v2
+	v0 += 5
+	sprite v0 v3 5
+;
+
+# We store whatever values we currently are using into scratch using save. We then draw the score, increment it, use bcd to encode each decimal digit of points into binary numbers into each value of score, then draw the score once more. We then reload the values from scratch.
+: inc-score
+	i := scratch
+	save v3
+	draw-score
+	points += 1
+	i := score
+	bcd points
+	draw-score
+	i := scratch
+	load v3
+;
+
+# Movement code for the player character
+: move-adventurer
+	v4 := advx
+	v5 := ADV_Y
+	# update "position" depending on what key is held.
+	v0 := 7
+	if v0 key then v4 += -4
+	v0 := 9
+	if v0 key then v4 +=  4
+
+	# Tweak v0 for animation purposes
+	# Give it the proper offset for anim-frame later on
+	# Since the adventurer is drawn with a size of 8, the offsets are 8 and 16,
+	# ...each for a different frame.
+	v0 := 0
+	if v4 != advx then v0 := 64
+	if anim-frame == 64 then v0 := 32
+
+	# Erase, move, and redraw sprite
+	i := adventurer
+	i += anim-frame
+	sprite advx v5 0
+	advx := v4
+	anim-frame := v0
+	i := adventurer
+	i += anim-frame
+	sprite advx v5 0
+;
+
+# Gem Logic
+# Based on code written by John Earnest for deep8.
+# In deep8, enemies needed to be avoided and hit with bombs.
+# In this game, however, the player wants to collide with gems and prevent them from touching the floor.
+
+# Spawns a gem in a random horizontal position between 0 and 121.
+# 0-121 is chosen so that no gems spawn in-between the wraparound portions of the play area.
+: spawn-gem
+	gemx := random 121
+	gemy := 7
+	i := gem
+	sprite gemx gemy 4
+;
+
+: count-gem
+	v0 -= v3
+	if v0 == 0 then spawn-gem
+;
+
+# Update the position of the gem.
+: update-gem
+	if v0 != 0 then jump count-gem
+	i := gem
+	sprite gemx gemy 4
+	gemy += gemspeed
+
+	# decrement lives if the gem hits the surface. We also decrement points to counter the increment that happens when the gem disappears
+	if gemy == 59 then lose-life
+	if gemspeed == 3 begin
+		if gemy == 58 then lose-life
+	end
+	i := gem
+	sprite gemx gemy 4
+
+	# Increment score if the adventurer grabs a gem.
+	if vf == 0 then return
+	sprite gemx gemy 4
+	# Reset counter
+	v0 := random 31
+	v0 += 10
+	inc-score
+;
+
+: update-gems
+	v3 := 1
+	counter ^= v3
+	if counter == 0 then return
+	# We load the exact vertical position we want for each of the four possible gems.
+	# Get gx, load it, x, and y from gemy, update it, save in gx
+	i := g1 load gemy update-gem i := g1 save gemy
+	i := g2 load gemy update-gem i := g2 save gemy
+	i := g3 load gemy update-gem i := g3 save gemy
+	i := g4 load gemy update-gem i := g4 save gemy
+	i := g5 load gemy update-gem i := g5 save gemy
+;
+
+: lose-life
+	points += -1
+	lives += -1
+	# redraw lives section
+	i := gem
+	v6 := 0
+	sprite life-position v6 4
+	life-position += -7
+	if lives == 0 then jump gameover
+;
+
+# When lives are 0, this code runs to "pause" the game and activate the buzzer. This buzzer remains for a few frames, then...
+: gameover
+	v0 := 32
+	buzzer := v0
+	delay  := v0
+	loop
+		v0 := delay
+		if v0 != 0 then
+	again
+	lose-game	
+
+# ...we clear the screen and we draw "YOU LOSE!"
+: lose-game
+	lores
+	clear
+	va := 18
+	vb := 10
+	i  := game-over1
+	sprite va vb 4
+	i  := game-over2
+	va += 8
+	sprite va vb 4
+	i  := game-over3
+	va += 8
+	sprite va vb 4
+	i  := game-over4
+	va += 8
+	sprite va vb 4
+	loop again
+;
