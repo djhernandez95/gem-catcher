@@ -14,7 +14,7 @@ Let 5 touch the ground, and it's game over. Good luck!
 Works best at 15 Cycles/Frame, but try 20 for a faster, tougher mode of play.
 
 Playable here: 
-http://johnearnest.github.io/Octo/index.html?gist=e33a4a4df8b32bcbae1e25d0bed18a6e
+http://johnearnest.github.io/Octo/index.html?gist=9bb95f3c69fd22e782781ccdd137a707
 
 Also Available: the original Gem Catcher (uses same controls)!
 http://johnearnest.github.io/Octo/index.html?gist=ed7a93392b4e0286a8b0213b0873f20a
