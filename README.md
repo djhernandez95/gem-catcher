@@ -1,5 +1,8 @@
 Super Gem Catcher
 ====
+![Title Image](https://github.com/djhernandez95/gem-catcher/blob/master/screenshots/SGC_Title_Proto.png)
+<i><p>(In-progress title screen still being developed, subject to change)</p></i>
+
 Originally developed for a class project, Super Gem Catcher is a simple game developed in [Octo](http://johnearnest.github.io/Octo/), an assembler for the [Chip8](http://mattmik.com/chip8.html) virtual machine by John Earnest. Compared to the original Gem Catcher (which is also included), this version is enhanced with a higher resolution, new Game Over screen, and a proper heads up display for tracking lives and scores. More enhancements to come!
 
 You play the role of an adventurer who has found themselves in a magical cave, rumored to once be the home of a powerful wizard. Deep within its tunnels, they come across an enchanted room where gems drop from the ceiling! 
@@ -13,8 +16,10 @@ Let 5 touch the ground, and it's game over. Good luck!
 
 Works best at 15 Cycles/Frame, but try 20 for a faster, tougher mode of play.
 
-Playable here: 
-http://johnearnest.github.io/Octo/index.html?gist=9bb95f3c69fd22e782781ccdd137a707
+![Image](https://github.com/djhernandez95/gem-catcher/blob/master/screenshots/SuperGemCatcher_gameplay.png)
+<p>Playable here: http://johnearnest.github.io/Octo/index.html?gist=9bb95f3c69fd22e782781ccdd137a707</p>
 
-Also Available: the original Gem Catcher (uses same controls)!
-http://johnearnest.github.io/Octo/index.html?gist=ed7a93392b4e0286a8b0213b0873f20a
+<p>Also Available: the original Gem Catcher (uses same controls)!</p>
+
+![Image](https://raw.githubusercontent.com/djhernandez95/gem-catcher/master/screenshots/GemCatcher_Gameplay.png)
+<p>Playable here: http://johnearnest.github.io/Octo/index.html?gist=ed7a93392b4e0286a8b0213b0873f20a</p>
