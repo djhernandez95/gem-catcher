@@ -93,6 +93,8 @@
 :const SPEED_UP 3
 
 : main
+	hires
+	title-screen
 	init-game
 	# Main game loop
 	loop
@@ -101,13 +103,88 @@
 		if points == 50 then gemspeed := SPEED_UP
 	again
 
+: title-screen
+	# Draw Title Screen text
+	va := 44
+	vb := 4
+	i  := s
+	sprite va vb 7
+	i  := u
+	va += 8
+	sprite va vb 7
+	i  := p
+	va += 8
+	sprite va vb 7
+	i  := e
+	va += 8
+	sprite va vb 7
+	i := r
+	va += 8
+	sprite va vb 7
+
+	va := 20
+	vb := 12
+	i  := g
+	sprite va vb 7
+	i  := e
+	va += 8
+	sprite va vb 7
+	i  := m
+	va += 8
+	sprite va vb 7
+	
+	va += 16
+	i  := c
+	sprite va vb 7
+	i  := a
+	va += 8
+	sprite va vb 7
+	i  := t
+	va += 8
+	sprite va vb 7
+	i  := c
+	va += 8
+	sprite va vb 7
+	i  := h
+	va += 8
+	sprite va vb 7
+	i  := e
+	va += 8
+	sprite va vb 7
+	i  := r
+	va += 8
+	sprite va vb 7
+
+	# Draw Extra Graphics
+	i := gem
+	va := 30
+	vb := 24
+	sprite va vb 4
+
+	va := 60
+	vb := 32
+	sprite va vb 4
+
+	va := 90
+	vb := 26
+	sprite va vb 4	
+
+	advx := 56
+	advy := 105
+	i := adventurer-walk1
+	sprite advx advy 0
+
+	# Press any key to play
+	v0 := key
+	clear
+;
+
 : init-game
 # Initialize registers
 	# Default positions and values
-	hires
 	draw-score
 	advx := 56
-	v3 := ADV_Y
+	advy := ADV_Y
 	points := 0
 	lives := 5
 	counter := 0
@@ -139,8 +216,28 @@
 		if v0 != 128 then
 	again
 	
+	# Draw "READY" and Adventurer - Pause in place to simulate classic games like Pac-Man
+	draw-ready
+	v0 := 64
+	delay  := v0
+	loop
+		v0 := delay
+		if v0 != 0 then
+	again
 	i := adventurer
-	sprite advx v3 0
+	sprite advx advy 0
+
+	v0 := 64
+	delay  := v0
+	loop
+		v0 := delay
+		if v0 != 0 then
+	again
+	draw-ready
+
+	# reinitialize animation frame and point value registers
+	va := 0
+	vb := 0
 ;
 
 # We load the values stores in the score section into v0, v1, and v2. We then use hex comands to convert the numbers into displayable sprites, which we then write to the top of the screen.
