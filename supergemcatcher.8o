@@ -19,7 +19,7 @@
 # Good luck!
 #
 # Works best at 15 Cycles/Frame, but try 20 for a faster, tougher mode of play.
-# Last Edited: February 13, 2018
+# Last Edited: February 27, 2018
 # sprites
 : gem 0x7A 0x76 0x3C 0x18
 : adventurer 
@@ -42,22 +42,27 @@
 : ceiling 0xFF 0xFF
 
 # Font Sprites
-: s 0x7C 0xC0 0xC0 0x78 0x0C 0x0C 0xF8
-: u 0x8C 0x8C 0x8C 0x8C 0x8C 0x8C 0x78
-: p 0xF8 0xC4 0xC4 0xC4 0xF8 0xC0 0xC0
-: e 0xFC 0xC0 0xC0 0xF8 0xC0 0xC0 0xFC
-: r 0xF8 0xC4 0xC4 0xC4 0xF8 0xC8 0xC4
-: g 0x78 0xC4 0xC0 0xCC 0xC4 0xC4 0x78
-: m 0x8C 0x8C 0xDC 0xAC 0xAC 0x8C 0x8C
-: c 0x78 0xC4 0xC0 0xC0 0xC0 0xC4 0x78
-: a 0x7C 0x8C 0x8C 0xFC 0x8C 0x8C 0x8C
-: t 0xFC 0x30 0x30 0x30 0x30 0x30 0x30
-: h 0x8C 0x8C 0x8C 0xFC 0x8C 0x8C 0x8C
-: d 0xF8 0xC4 0xC4 0xC4 0xC4 0xC4 0xF8
-: y 0xC4 0xC4 0x68 0x30 0x30 0x30 0x30
-: o 0x78 0x8C 0x8C 0x8C 0x8C 0x8C 0x78
-: v 0x8C 0x8C 0x8C 0x8C 0x8C 0x58 0x30
-
+: a 0x78 0x9C 0x9C 0xFC 0x9C 0x9C
+: c 0x78 0xCC 0xC0 0xC0 0xCC 0x78
+: d 0xF8 0x9C 0x9C 0x9C 0x9C 0xF8
+: e 0xFC 0xC0 0xF8 0xC0 0xC0 0xFC
+: g 0x78 0xCC 0xC0 0xDC 0xCC 0x7C
+: h 0x8C 0x8C 0xFC 0x8C 0x8C 0x8C
+: k 0xCC 0xD8 0xF0 0xF0 0xD8 0xCC
+: l 0xC0 0xC0 0xC0 0xC0 0xC0 0xFC
+: m 0x8C 0xDC 0xFC 0xAC 0x8C 0x8C
+: n 0x8C 0xCC 0xEC 0xBC 0x9C 0x8C
+: o 0x78 0xCC 0xCC 0xCC 0xCC 0x78
+: p 0xF8 0xCC 0xCC 0xF8 0xC0 0xC0
+: r 0xF8 0xCC 0xCC 0xF8 0xD0 0xCC
+: s 0x78 0xC0 0x78 0x1C 0x9C 0x78
+: t 0xFC 0x30 0x30 0x30 0x30 0x30
+: u 0x8C 0x8C 0x8C 0x8C 0x9C 0x78
+: v 0x8C 0x8C 0x8C 0x8C 0x58 0x30
+: y 0xCC 0xCC 0x78 0x30 0x30 0x30
+: arrow-left 0x20 0x40 0xFC 0x40 0x20
+: arrow-right 0x10 0x08 0xFC 0x08 0x10
+: five 0xF8 0xC0 0xF8 0x1C 0x9C 0x78
 
 # List of Register Aliases
 # Position, Lives, and Points for Adventurer
@@ -95,6 +100,8 @@
 : main
 	hires
 	title-screen
+	instructions-1
+	instructions-2
 	init-game
 	# Main game loop
 	loop
@@ -106,77 +113,294 @@
 : title-screen
 	# Draw Title Screen text
 	va := 44
-	vb := 4
+	vb := 2
 	i  := s
-	sprite va vb 7
+	sprite va vb 6
 	i  := u
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := p
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := e
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i := r
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 
 	va := 20
-	vb := 12
+	vb := 10
 	i  := g
-	sprite va vb 7
+	sprite va vb 6
 	i  := e
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := m
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	
 	va += 16
 	i  := c
-	sprite va vb 7
+	sprite va vb 6
 	i  := a
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := t
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := c
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := h
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := e
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := r
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 
 	# Draw Extra Graphics
 	i := gem
 	va := 30
-	vb := 24
+	vb := 20
 	sprite va vb 4
 
 	va := 60
-	vb := 32
+	vb := 28
 	sprite va vb 4
 
 	va := 90
-	vb := 26
+	vb := 24
 	sprite va vb 4	
 
 	advx := 56
-	advy := 105
+	advy := 100
 	i := adventurer-walk1
 	sprite advx advy 0
+
+	# Delay to show off title screen
+	menu-delay	
+
+	va := 12
+	vb := 110
+	i  := p
+	sprite va vb 6
+	i  := r
+	va += 8
+	sprite va vb 6
+	i  := e
+	va += 8
+	sprite va vb 6
+	i  := s
+	va += 8
+	sprite va vb 6
+	va += 8
+	sprite va vb 6
+
+	va := 76
+	i  := a
+	sprite va vb 6
+	i  := k
+	va += 16
+	sprite va vb 6
+	i  := e
+	va += 8
+	sprite va vb 6
+	i  := y
+	va += 8
+	sprite va vb 6
 
 	# Press any key to play
 	v0 := key
 	clear
+;
+
+: instructions-1
+	va := 18
+	vb := 10
+	i  := c
+	sprite va vb 6
+	i  := a
+	va += 8
+	sprite va vb 6
+	i  := t
+	va += 8
+	sprite va vb 6
+	i  := c
+	va += 8
+	sprite va vb 6
+	i  := h
+	va += 8
+	sprite va vb 6
+
+	va += 16
+	i  := g
+	sprite va vb 6
+	i  := e
+	va += 8
+	sprite va vb 6
+	i  := m
+	va += 8
+	sprite va vb 6
+	i  := s
+	va += 8
+	sprite va vb 6
+	i := gem
+	va += 12
+	vb += 2
+	sprite va vb 4
+
+
+	va := 18
+	vb := 26
+	i  := m
+	sprite va vb 6
+	i  := o
+	va += 8
+	sprite va vb 6
+	i  := v
+	va += 8
+	sprite va vb 6
+	i  := e
+	va += 8
+	sprite va vb 6
+
+	va += 18
+	i  := arrow-left
+	sprite va vb 5
+	i  := a
+	va += 12
+	sprite va vb 6
+	i  := d
+	va += 20
+	sprite va vb 6
+	i  := arrow-right
+	va += 12
+	sprite va vb 5
+
+
+	# Delay to show off instructions
+	menu-delay
+	
+	draw-press-key-instructions
+
+	# Press any key to continue
+	v0 := key
+	clear
+;
+
+: instructions-2
+	va := 20
+	vb := 10
+	i  := d
+	sprite va vb 6
+	i  := r
+	va += 8
+	sprite va vb 6
+	i  := o
+	va += 8
+	sprite va vb 6
+	i  := p
+	va += 8
+	sprite va vb 6
+
+	va += 16
+	i  := five
+	sprite va vb 6
+	i := gem
+	va += 8
+	vb += 2
+	sprite va vb 4
+
+	va += 16
+	vb := 10
+	i  := a
+	sprite va vb 6
+	i  := n
+	va += 8
+	sprite va vb 6
+	i  := d
+	va += 8
+	sprite va vb 6
+
+	
+	va := 30
+	vb := 26
+	i  := y
+	sprite va vb 6
+	i  := o
+	va += 8
+	sprite va vb 6
+	i  := u
+	va += 8
+	sprite va vb 6
+
+	va += 16
+	i  := l
+	sprite va vb 6
+	i  := o
+	va += 8
+	sprite va vb 6
+	i  := s
+	va += 8
+	sprite va vb 6
+	i  := e
+	va += 8
+	sprite va vb 6
+
+	# Delay to show off rules
+	menu-delay
+
+	draw-press-key-instructions
+
+	# Press any key to play
+	v0 := key
+	clear
+;
+
+# a delay used in menus
+: menu-delay
+	v0 := 128
+	delay  := v0
+	loop
+		v0 := delay
+		if v0 != 0 then
+	again
+;
+
+# Draws "Press A Key" for the instructions menu.
+: draw-press-key-instructions
+	va := 20
+	vb := 110
+	i  := p
+	sprite va vb 6
+	i  := r
+	va += 8
+	sprite va vb 6
+	i  := e
+	va += 8
+	sprite va vb 6
+	i  := s
+	va += 8
+	sprite va vb 6
+	va += 8
+	sprite va vb 6
+
+	va += 16
+	i  := a
+	sprite va vb 6
+	i  := k
+	va += 16
+	sprite va vb 6
+	i  := e
+	va += 8
+	sprite va vb 6
+	i  := y
+	va += 8
+	sprite va vb 6
 ;
 
 : init-game
@@ -240,7 +464,26 @@
 	vb := 0
 ;
 
-# We load the values stores in the score section into v0, v1, and v2. We then use hex comands to convert the numbers into displayable sprites, which we then write to the top of the screen.
+: draw-ready
+	va := 44
+	vb := 25
+	i  := r
+	sprite va vb 6
+	i  := e
+	va += 8
+	sprite va vb 6
+	i  := a
+	va += 8
+	sprite va vb 6
+	i  := d
+	va += 8
+	sprite va vb 6
+	i := y
+	va += 8
+	sprite va vb 6
+;
+
+# We load the values stores in the score section into v0, v1, and v2. We then use hex commands to convert the numbers into displayable sprites, which we then write to the top of the screen.
 : draw-score
 	i := score
 	load v2
