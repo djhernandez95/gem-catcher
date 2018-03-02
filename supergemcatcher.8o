@@ -19,7 +19,7 @@
 # Good luck!
 #
 # Works best at 15 Cycles/Frame, but try 20 for a faster, tougher mode of play.
-# Last Edited: February 27, 2018
+# Last Edited: March 1, 2018
 # sprites
 : gem 0x7A 0x76 0x3C 0x18
 : adventurer 
@@ -281,7 +281,6 @@
 	va += 12
 	sprite va vb 5
 
-
 	# Delay to show off instructions
 	menu-delay
 	
@@ -361,9 +360,9 @@
 	clear
 ;
 
-# a delay used in menus
+# a delay used in menus and the "READY" screen
 : menu-delay
-	v0 := 128
+	v0 := 64
 	delay  := v0
 	loop
 		v0 := delay
@@ -371,7 +370,7 @@
 	again
 ;
 
-# Draws "Press A Key" for the instructions menu.
+# Draws "Press A Key" for the instruction menus.
 : draw-press-key-instructions
 	va := 20
 	vb := 110
@@ -404,8 +403,7 @@
 ;
 
 : init-game
-# Initialize registers
-	# Default positions and values
+	# Initialize registers with default positions and values
 	draw-score
 	advx := 56
 	advy := ADV_Y
@@ -413,7 +411,8 @@
 	lives := 5
 	counter := 0
 	gemspeed := INITIAL_SPEED
-	# Draw the scene
+	
+	# Draw lives on the screen, represented as gems
 	i := gem
 	life-position := 0
 	v0 := 0
@@ -424,6 +423,7 @@
 	again
 	life-position += -7
 
+	#draw the scene
 	i := ceiling
 	v4 := 126
 	loop
@@ -440,23 +440,12 @@
 		if v0 != 128 then
 	again
 	
-	# Draw "READY" and Adventurer - Pause in place to simulate classic games like Pac-Man
+	# Draw "READY" and Adventurer - Use menu-delay twice to simulate classic games like Pac-Man
 	draw-ready
-	v0 := 64
-	delay  := v0
-	loop
-		v0 := delay
-		if v0 != 0 then
-	again
+	menu-delay
 	i := adventurer
 	sprite advx advy 0
-
-	v0 := 64
-	delay  := v0
-	loop
-		v0 := delay
-		if v0 != 0 then
-	again
+	menu-delay
 	draw-ready
 
 	# reinitialize animation frame and point value registers
@@ -464,6 +453,7 @@
 	vb := 0
 ;
 
+# Draws "READY" text, as used when intializing the game.
 : draw-ready
 	va := 44
 	vb := 25
@@ -619,36 +609,36 @@
 	again
 	lose-game	
 
-# ...we clear the screen and we draw "YOU LOSE!"
+# ...we clear the screen and we draw "GAME OVER", plus the user's score.
 : lose-game
 	clear
 	draw-score
 	va := 28
 	vb := 24
 	i  := g
-	sprite va vb 7
+	sprite va vb 6
 	i  := a
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := m
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := e
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 
 	va += 16
 	i  := o
-	sprite va vb 7
+	sprite va vb 6
 	i  := v
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := e
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 	i  := r
 	va += 8
-	sprite va vb 7
+	sprite va vb 6
 
 	loop again
 ;
